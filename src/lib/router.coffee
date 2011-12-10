@@ -68,8 +68,11 @@ routes = ->
   app.get "/feeds", (req, res) ->
 
     db.get "items", (err, doc) ->
-      console.log doc
-      res.render "feeds"
+      data =
+        name : doc.description
+        path : doc.image
+
+      res.render "feeds", data
   # ------------------------------------------------
 
   # Sell -------------------------------------------
@@ -79,8 +82,10 @@ routes = ->
   app.post "/sell", (req, res, next) ->
     image = req.body.image
     desc  = req.body.description
+    price = req.body.price
     ins   = fs.createReadStream req.files.image.path
     ous   = fs.createWriteStream "#{ process.cwd() }/public/images/items/#{ req.files.image.filename }"
+    src   = "/images/items/#{ req.files.image.filename }"
 
     util.pump ins, ous, (err) ->
       if err
@@ -88,8 +93,9 @@ routes = ->
       else
 
         db.save "items",
-          description  : desc
-          image        : ous
+          description : desc
+          image       : src
+          price       : price
         , (err, result) ->
           if err
             console.log err
