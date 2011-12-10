@@ -21,8 +21,10 @@ exports.Item = resourceful.define "items", ->
   @property "modified", Date
   @property "tags", Array
   @property "likes", Array
+  @property "userId", Number
   # ------
 
+  return undefined
 # ------
 
 # User -----
@@ -38,6 +40,8 @@ exports.User = resourceful.define "users", ->
   @property "password", String
   @property "email", String
   # -----
+
+  return undefined
 
 # ------
 

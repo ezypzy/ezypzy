@@ -1,23 +1,34 @@
-var app, conf, director, flatiron, path;
+var app, conf, express, router;
 
-flatiron = require("flatiron");
+express = require("express");
 
-path = require("path");
+app = module.exports = express.createServer();
 
-director = require("./lib/router");
+router = require("./lib/router");
 
 conf = require("./config/global.conf");
 
-app = flatiron.app;
-
-app.use(flatiron.plugins.cli, {
-  dir: path.join(__dirname, 'lib', 'commands'),
-  usage: "Snap.Sell.Share; Server is listening on port " + conf.port
+app.configure(function() {
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(express.cookieParser());
+  app.use(express.session({
+    secret: "ezypzy",
+    key: "express.sid"
+  }));
+  app.use(express.errorHandler({
+    showStack: true,
+    dumpExceptions: true
+  }));
+  app.use(app.router);
+  app.use(express.static(__dirname + "/public"));
+  app.set("views", __dirname + "/views");
+  return app.set("view engine", "jade");
 });
 
-if (require.main === module) {
-  app.init(function() {
-    director.listen(conf.port);
-    return app.start();
-  });
+router.routes();
+
+if (!module.parent) {
+  app.listen(conf.port);
+  console.log("Server listening on port %d", app.address().port);
 }
