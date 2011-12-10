@@ -4,7 +4,7 @@ flatiron = require("flatiron");
 
 path = require("path");
 
-director = require("./lib/director");
+director = require("./lib/router");
 
 conf = require("./config/global.conf");
 
