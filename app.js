@@ -1,14 +1,23 @@
-var flatiron = require('flatiron'),
-    path = require('path')
-    app = flatiron.app;
+var app, conf, director, flatiron, path;
+
+flatiron = require("flatiron");
+
+path = require("path");
+
+director = require("./lib/director");
+
+conf = require("./config/global.conf");
+
+app = flatiron.app;
 
 app.use(flatiron.plugins.cli, {
-  dir: path.join(__dirname,'lib','commands'),
-  usage: 'Empty Flatiron Application, please fill out commands'
+  dir: path.join(__dirname, 'lib', 'commands'),
+  usage: "Snap.Sell.Share; Server is listening on port " + conf.port
 });
 
 if (require.main === module) {
-  app.init(function () {
-    app.start();
+  app.init(function() {
+    director.listen(conf.port);
+    return app.start();
   });
 }

@@ -1,9 +1,15 @@
 {
  "name": "ezypzy/",
- "private": true,
+ "private": false,
  "version": "0.0.0",
  "dependencies": {
-  "flatiron": "0.1.5-1"
+      "flatiron"    : "0.1.5-1"
+    , "director"    : ">= 0.0.0"
+    , "plates"      : ">= 0.0.0"
+    , "union"       : ">= 0.0.0"
+    , "broadway"    : ">= 0.0.0"
+    , "resourceful" : ">= 0.0.0"
+    , "nodeunit"    : ">= 0.0.0"
  },
  "devDependencies": {
   "vows": "0.5.x"
