@@ -3,7 +3,9 @@ app      = require("../app")
 cradle   = require("cradle")
 fs       = require("fs")
 conf     = require("../config/global.conf")
+form     = require("connect-form")
 db       = new(cradle.Connection)().database("ezypzy")
+util     = require("util")
 # ------
 
 # Routes ==============================================================================
@@ -12,7 +14,14 @@ routes = ->
 
   # Home page --------------------------------------
   app.get "/", (req, res) ->
-    res.render "index"
+    data =
+      loggedIn : false
+
+    if req.session.loggedIn is true
+      data =
+        loggedIn : true
+
+    res.render "index", data
   # ------------------------------------------------
 
   # Register ---------------------------------------
@@ -23,7 +32,7 @@ routes = ->
     name  = req.body.name
     email = req.body.email
 
-    db.save "items",
+    db.save "users",
       name  : name
       email : email
     , (err, result) ->
@@ -42,102 +51,56 @@ routes = ->
     name  = req.body.name
     email = req.body.email
 
-    db.get "items", (err, doc) ->
-      if name is doc.name && email is doc.email
+    db.get "users", (err, doc) ->
+
+      if name is doc.name and email is doc.email
+        req.session.loggedIn = true
         res.redirect "/"
       else
         res.send "Failed"
+
+        setTimeout ->
+          res.redirect "/"
+        , 3000
+  # ------------------------------------------------
+
+  # Feeds ------------------------------------------
+  app.get "/feeds", (req, res) ->
+
+    db.get "items", (err, doc) ->
+      console.log doc
+      res.render "feeds"
+  # ------------------------------------------------
+
+  # Sell -------------------------------------------
+  app.get "/sell", (req, res) ->
+    res.render "sell"
+
+  app.post "/sell", (req, res, next) ->
+    image = req.body.image
+    desc  = req.body.description
+    ins   = fs.createReadStream req.files.image.path
+    ous   = fs.createWriteStream "#{ process.cwd() }/public/images/items/#{ req.files.image.filename }"
+
+    util.pump ins, ous, (err) ->
+      if err
+        next(err)
+      else
+
+        db.save "items",
+          description  : desc
+          image        : ous
+        , (err, result) ->
+          if err
+            console.log err
+          else
+            res.redirect("/feeds")
 
   # ------------------------------------------------
 
 
 
-
 # =====================================================================================
-
-
-
-
-# Functions for routes ================================================================
-
-# Lightweight view layer -----
-# viewLayer = (viewFile) ->
-#   html = fs.readFileSync "#{ process.cwd() }/views/#{ viewFile }", "utf8"
-
-#   return html
-# # -----
-
-# # Home -----
-# home = (route) ->
-#   viewFile = "index.html"
-
-#   @res.writeHead 200, { "Content-Type": "text/html" }
-#   @res.end viewLayer(viewFile)
-# #-----
-
-# # Register -----
-# register = (route) ->
-#   viewFile = "register.html"
-
-#   @res.writeHead 200, { "Content-Type" : "text/html" }
-#   @res.end viewLayer(viewFile)
-
-# registerPost = ->
-#   options =
-#     host   : "127.0.0.1"
-#     port   : conf.port
-#     path   : "/register"
-#     method : "POST"
-
-#   req = http.request options, (res) ->
-
-#     res.setEnconding "utf8"
-
-#     res.on 'data', (chunk) ->
-#       console.log('BODY: ' + chunk)
-
-#   req.on 'error', (e) ->
-#     console.log('problem with request: ' + e.message)
-
-#   req.end()
-# # ----
-
-# # =====================================================================================
-
-# # Defining router =====================================================================
-
-# router = new director.http.Router
-#   # Home path "../" -----
-#   "/" :
-#     get : home
-#   # -------
-
-#   # Register path "../register" -----
-#   "/register" :
-#     get  : register
-#     post : registerPost
-#   # ------
-
-# # =====================================================================================
-
-# # Creating server =====================================================================
-# server = http.createServer (req, res) ->
-
-#   # Dispatching router -----
-#   router.dispatch req, res, (err) ->
-
-#     if err
-#       res.writeHead(404)
-#       res.end()
-#   # -----
-
-# # =====================================================================================
-
-# # Binding routes into router ==========================================================
-
-# router.get("/", home) # Home
-
-# # =====================================================================================
 
 # Exports the server to app.js -----
 module.exports =

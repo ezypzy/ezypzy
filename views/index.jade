@@ -1,3 +1,14 @@
-a(href="/register") Register
-br
-a(href="/login") Login
+
+// Registration & Login ===================================
+- if (loggedIn === false)
+  a(href="/register") Register
+  br
+  a(href="/login") Login
+// ========================================================
+
+// Feeds page =============================================
+- if (loggedIn === true)
+  a(href="/feeds") Feeds
+  br
+  a(href="/sell") Sell
+// ========================================================
