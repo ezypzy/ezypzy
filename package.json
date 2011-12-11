@@ -1,21 +1,27 @@
 {
- "name": "ezypzy/",
- "private": false,
- "version": "0.0.0",
- "dependencies": {
-      "flatiron"    : "0.1.5-1"
-    , "director"    : ">= 0.0.0"
-    , "plates"      : ">= 0.0.0"
-    , "union"       : ">= 0.0.0"
-    , "broadway"    : ">= 0.0.0"
-    , "resourceful" : ">= 0.0.0"
-    , "nodeunit"    : ">= 0.0.0"
- },
- "devDependencies": {
-  "vows": "0.5.x"
- },
- "scripts": {
-  "test": "vows",
-  "start": "node app.js"
- }
+  "name": "ezypzy",
+  "private": false,
+  "version": "0.0.0-9",
+  "dependencies": {
+    "director": ">= 0.0.0",
+    "plates": ">= 0.0.0",
+    "union": ">= 0.0.0",
+    "broadway": ">= 0.0.0",
+    "resourceful": ">= 0.0.0",
+    "nodeunit": ">= 0.0.0",
+    "express": ">= 0.0.0",
+    "cradle": ">= 0.0.0",
+    "jade": ">= 0.0.0"
+  },
+  "engines": {
+    "node": ">= v0.6.5"
+  },
+  "devDependencies": {
+    "vows": "0.5.x"
+  },
+  "scripts": {
+    "test": "vows",
+    "start": "app.js"
+  },
+  "subdomain": "ezypzy"
 }

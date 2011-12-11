@@ -1,11 +1,14 @@
 # Load dependencies -----
+util     = require("util")
 app      = require("../app")
 cradle   = require("cradle")
 fs       = require("fs")
 conf     = require("../config/global.conf")
-form     = require("connect-form")
-db       = new(cradle.Connection)().database("ezypzy")
-util     = require("util")
+db       = new(cradle.Connection)('http://localhost', 5984, {
+  cache: true,
+  raw: false
+}).database("ezypzy")
+
 # ------
 
 # Routes ==============================================================================
@@ -67,12 +70,22 @@ routes = ->
   # Feeds ------------------------------------------
   app.get "/feeds", (req, res) ->
 
-    db.get "items", (err, doc) ->
-      data =
-        name : doc.description
-        path : doc.image
+    db.all (err, doc) ->
 
-      res.render "feeds", data
+      data = []
+      for d in doc
+        if /items/.test(d.id) is true
+
+          db.get d.id, (err, res) ->
+            dd =
+              name  : res.description
+              path  : res.image
+              price : res.price
+
+            data.push dd
+
+      process.nextTick ->
+        res.render "feeds", { data : data }
   # ------------------------------------------------
 
   # Sell -------------------------------------------
@@ -92,7 +105,7 @@ routes = ->
         next(err)
       else
 
-        db.save "items",
+        db.save "items" + Math.random(),
           description : desc
           image       : src
           price       : price
@@ -102,6 +115,11 @@ routes = ->
           else
             res.redirect("/feeds")
 
+  # ------------------------------------------------
+
+  # Buy --------------------------------------------
+  app.get "/buy", (req, res) ->
+    res.render "buy"
   # ------------------------------------------------
 
 
